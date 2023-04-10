@@ -1,0 +1,21 @@
+{
+  "name": "it122",
+  "version": "1.0.0",
+  "description": "sample node application for it122",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/John-Orange/IT122.git"
+  },
+  "author": "zhongyuan huang",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/John-Orange/IT122/issues"
+  },
+  "homepage": "https://github.com/John-Orange/IT122#readme"
+}
