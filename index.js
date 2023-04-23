@@ -1,10 +1,9 @@
 'use strict'
 import express from 'express';
+import * as data from './data.js';
 
 //import * as http from 'http';
 //import * as querystring from 'querystring';
-import * as data from './data.js';
-
 //const querystring = require('node:querystring');
 console.log("1 - Program Start");
 
@@ -19,12 +18,19 @@ app.get('/', (req,res) => {
   res.render('home', {fruits});
 });
 
+//console.log(data.getAll());
 
 app.get('/fruit/:id', (req, res) => {
-  const fruitId = req.params.id;
-  const fruit = fruits.find(fruit => fruit.id == fruitId);
-  res.render('detail', { fruit });
+  const id = req.params.id;
+  const fruit = fruits.find((fruit) => fruit.name === id);
+  
+
+  res.render('detail', { fruit: fruit });
+
+  console.log(fruit);
+  console.log(id);
 });
+
 
 app.get('/about', (req,res) => {
   res.sendFile('/public/about.html');

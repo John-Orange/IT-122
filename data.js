@@ -11,3 +11,4 @@ const getAll =()=> {
 }
 
 export {getAll}
+
