@@ -12,4 +12,6 @@ const getAll =()=> {
 
 export {getAll}
 
+console.log(fruits);
+
 

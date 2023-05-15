@@ -1,17 +1,56 @@
 'use strict'
 import express from 'express';
-import * as data from './data.js';
+//import * as data from './data.js';
+import { Fruits } from "./models/Fruit.js";
 
 //import * as http from 'http';
 //import * as querystring from 'querystring';
 //const querystring = require('node:querystring');
 console.log("1 - Program Start");
 
+function getAllFruits() {
+  return Fruits.find({}).lean()
+    .then((fruits) => {
+      return fruits;
+    })
+    .catch((err) => {
+      throw err;
+    });
+}
+
 const app = express();
 app.set('port', process.env.PORT || 3000);
 app.use(express.static('public'));
 app.set('view engine', 'ejs');
 
+app.get('/', (req, res) => {
+  getAllFruits()
+    .then((fruits) => {
+      res.render('home', { fruits });
+    })
+    .catch((err) => {
+      res.status(500).send('Error fetching fruits from database');
+    });
+});
+
+app.get('/fruit/:id', (req, res) => {
+  const id = req.params.id;
+
+  Fruits.findOne({ name: id }).lean()
+    .then((fruit) => {
+      if (fruit) {
+        res.render('detail', { fruit });
+      } else {
+        res.status(404).send('Fruit not found');
+      }
+    })
+    .catch((err) => {
+      res.status(500).send('Error fetching fruit from database');
+    });
+});
+
+
+/*
 // define some routes
 const fruits = data.getAll();
 app.get('/', (req,res) => {
@@ -23,18 +62,12 @@ app.get('/', (req,res) => {
 app.get('/fruit/:id', (req, res) => {
   const id = req.params.id;
   const fruit = fruits.find((fruit) => fruit.name === id);
-  
-
-  res.render('detail', { fruit: fruit });
-
-  console.log(fruit);
-  console.log(id);
-});
 
 
 app.get('/about', (req,res) => {
   res.sendFile('/public/about.html');
 });
+*/
 
 app.use((req,res) => {
  res.status(404);
