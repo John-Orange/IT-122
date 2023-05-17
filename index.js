@@ -30,7 +30,7 @@ app.get('/', (req, res) => {
       res.render('home', { fruits });
     })
     .catch((err) => {
-      res.status(500).send('Error fetching fruits from database');
+      res.status(500).send('Error');
     });
 });
 
@@ -39,14 +39,10 @@ app.get('/fruit/:id', (req, res) => {
 
   Fruits.findOne({ name: id }).lean()
     .then((fruit) => {
-      if (fruit) {
         res.render('detail', { fruit });
-      } else {
-        res.status(404).send('Fruit not found');
-      }
     })
     .catch((err) => {
-      res.status(500).send('Error fetching fruit from database');
+      res.status(500).send('Error');
     });
 });
 
