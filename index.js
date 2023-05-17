@@ -46,8 +46,6 @@ app.get('/fruit/:id', (req, res) => {
     });
 });
 
-
-
 /*
 // define some routes
 const fruits = data.getAll();
