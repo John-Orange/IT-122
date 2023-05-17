@@ -1,4 +1,3 @@
-
 import mongoose from 'mongoose';
 import {connectionString} from "../credentials.js";
 const { Schema } = mongoose;
