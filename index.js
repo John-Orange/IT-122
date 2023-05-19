@@ -9,41 +9,26 @@ import { Fruits } from "./models/Fruit.js";
 //const querystring = require('node:querystring');
 console.log("1 - Program Start");
 
-function getAllFruits() {
-  return Fruits.find({}).lean()
-    .then((fruits) => {
-      return fruits;
-    })
-    .catch((err) => {
-      throw err;
-    });
-}
-
 const app = express();
 app.set('port', process.env.PORT || 3000);
 app.use(express.static('public'));
 app.set('view engine', 'ejs');
 
-app.get('/', (req, res) => {
-  getAllFruits()
+app.get('/',(req, res, next) => {
+  Fruits.find({}).lean()
     .then((fruits) => {
-      res.render('home', { fruits });
-    })
-    .catch((err) => {
-      res.status(500).send('Error');
-    });
+      res.render('home',{ fruits });
+  })
+    .catch(err => next(err))
 });
 
-app.get('/fruit/:id', (req, res) => {
+app.get('/fruit/:id', (req, res, next) => {
   const id = req.params.id;
-
   Fruits.findOne({ name: id }).lean()
     .then((fruit) => {
-        res.render('detail', { fruit });
+      res.render('detail', { fruit });
     })
-    .catch((err) => {
-      res.status(500).send('Error');
-    });
+    .catch(err => next(err));
 });
 
 
