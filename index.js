@@ -2,6 +2,9 @@
 import express from 'express';
 //import * as data from './data.js';
 import { Fruits } from "./models/Fruit.js";
+import cors from 'cors';
+
+
 
 
 //import * as http from 'http';
@@ -13,7 +16,63 @@ const app = express();
 app.set('port', process.env.PORT || 3000);
 app.use(express.static('public'));
 app.set('view engine', 'ejs');
+app.use('/api', cors()); // set Access-Control-Allow-Origin header for api route
+app.use(express.json()); //Used to parse JSON bodies
 
+//hw4
+app.get('/api/fruits', (req,res) => {
+  Fruits.find({}).lean()
+    .then((fruits) => {
+      res.json(fruits);
+    })
+    .catch(err =>  {
+      res.status(500).send('Database Error occurred');
+    })
+});
+
+app.get('/api/fruits/:id', (req,res) => {
+    Fruits.findOne({ name:req.params.id }).lean()
+        .then((fruits) => {
+           res.json(fruits);
+        })
+        .catch(err => {
+            res.status(500).send('Database Error occurred');
+        });
+});
+
+app.post('/api/fruits', (req, res) => {
+  const { name, color, calories, origin, taste } = req.body;
+
+  Fruits.findOneAndUpdate(
+    { name: name },
+    { color: color, calories: calories, origin: origin, taste: taste },
+    { upsert: true, new: true }
+  )
+    .lean()
+    .then((fruit) => {
+      res.json(fruit);
+    })
+    .catch((err) => {
+      res.status(500).send('Database Error occurred');
+    });
+});
+
+app.delete('/api/fruits/:id', (req, res) => {
+  Fruits.findOneAndDelete({ name: req.params.id })
+    .lean()
+    .then((fruit) => {
+      if (fruit) {
+        res.json({ message: 'Fruit deleted successfully' });
+      } else {
+        res.status(404).json({ message: 'Fruit not found' });
+      }
+    })
+    .catch((err) => {
+      res.status(500).send('Database Error occurred');
+    });
+});
+
+//hw3
 app.get('/',(req, res, next) => {
   Fruits.find({}).lean()
     .then((fruits) => {
