@@ -1,0 +1,39 @@
+<html>
+<head>
+    <title>React Fruits</title>
+
+    <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+
+    <!-- Don't use this in production: -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+
+<body>
+
+<div id="root"></div>
+<script type="text/babel">
+
+    const items = <%- fruits %>;
+    console.log(items);
+
+    // define other components
+    const Fruits = (props) => {
+      const listItems = props.items.map((item) => <li key={item._id}>{item.name}</li>);
+      return <ul>{listItems}</ul>;
+    };
+
+    const App = (props) => {
+      console.log(props.items);
+      return (
+        <div>
+          <h1>Fruits</h1>
+          <Fruits items={props.items} />
+        </div>
+      );
+    };
+
+    ReactDOM.render(<App items={items} />, document.getElementById('root'));
+</script>
+</body>
+</html>

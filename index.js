@@ -76,7 +76,7 @@ app.delete('/api/fruits/:id', (req, res) => {
 app.get('/',(req, res, next) => {
   Fruits.find({}).lean()
     .then((fruits) => {
-      res.render('home',{ fruits });
+      res.render('home_react',{fruits: JSON.stringify(fruits)});
   })
     .catch(err => next(err))
 });
