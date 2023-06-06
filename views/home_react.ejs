@@ -14,26 +14,81 @@
 <div id="root"></div>
 <script type="text/babel">
 
-    const items = <%- fruits %>;
-    console.log(items);
+    //const items = <%- fruits %>;
 
     // define other components
     const Fruits = (props) => {
-      const listItems = props.items.map((item) => <li key={item._id}>{item.name}</li>);
+      const listItems = props.items.map((item) => <li onClick={props.onClick} key={item._id}>{item.name}</li>);
       return <ul>{listItems}</ul>;
     };
+  
+    const Detail = (props) => {
+      return(
+        <div>
+          <h3>Detail of the fruits</h3>
+          <b>name:</b> <input type="text" name="name" value={props.detail.name || ""} onChange={props.onChange}/> <br/>
+          <b>color:</b>  <input type="text" name="color" value={props.detail.color || ""} onChange={props.onChange}/> <br/>
+          <b>calories:</b> <input type="text" name="calories" value={props.detail.calories || ""} onChange={props.onChange}/> <br/>
+          <b>orgin:</b> <input type="text" name="orgin" value={props.detail.orgin || ""} onChange={props.onChange}/> <br/>
+        </div>
+      )
+    }
+
+    const ClearButton = (props) => {
+      return <button onClick={props.onClick}>Clear</button>;
+    };
+
 
     const App = (props) => {
-      console.log(props.items);
+    const [items, setItems] = React.useState(<%- fruits %>);
+
+    const [currentItem, setCurrentItem] = React.useState({});
+
+    // list click event handler
+    const selectItem = (event) => {
+      console.log(event.target);
+      const found = items.find((item) => {
+        return item.name === event.target.innerText;
+      });
+      setCurrentItem(found);
+    };
+
+    // update list state
+    const handleChange = (event) => {
+      console.log(event.target)
+      let newItem = {...currentItem};
+      newItem[event.target.name] = event.target.value;
+      console.log(newItem)
+
+    //update currentItem state
+      setCurrentItem(newItem);
+
+    //update list state
+      items.find((item,index) => {
+        if(item.name == newItem.name) {
+          items[index] = newItem;
+          setItems(items);
+        }
+      })
+    }
+
+    const handleClear = () => {
+      setItems(<%- fruits %>);
+      setCurrentItem({});
+    };
+
+      
       return (
         <div>
           <h1>Fruits</h1>
-          <Fruits items={props.items} />
+          <Fruits items={items} onClick={selectItem}/>
+          <Detail detail={currentItem} onChange={handleChange}/>
+          <ClearButton onClick={handleClear} />
         </div>
       );
     };
 
-    ReactDOM.render(<App items={items} />, document.getElementById('root'));
+    ReactDOM.render(<App />, document.getElementById('root'));
 </script>
 </body>
 </html>
