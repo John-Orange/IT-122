@@ -18,7 +18,10 @@
 
     // define other components
     const Fruits = (props) => {
-      const listItems = props.items.map((item) => <li onClick={props.onClick} key={item._id}>{item.name}</li>);
+      const listItems = props.items.map((item) =>
+       <li onClick={props.onClick} key={item._id}>
+        {item.name}
+        </li>);
       return <ul>{listItems}</ul>;
     };
   
@@ -38,44 +41,110 @@
       return <button onClick={props.onClick}>Clear</button>;
     };
 
+    const SaveButton = (props) => {
+      return <button onClick={props.onClick}>Save</button>;
+    };
+
+    const DeleteButton = (props) => {
+      return <button onClick={props.onClick}>Delete</button>;
+    };
+
 
     const App = (props) => {
-    const [items, setItems] = React.useState(<%- fruits %>);
+      const [items, setItems] = React.useState([]);
+      const [currentItem, setCurrentItem] = React.useState({});
 
-    const [currentItem, setCurrentItem] = React.useState({});
+      
+//
+      React.useEffect(() => {
+        const fetchData = async () => {
+          fetch("/api/fruits").then(res => res.json())
+          .then((json) => {
+            setItems(json);
+          })
+        }
+        fetchData()
+      }, []);
+
 
     // list click event handler
-    const selectItem = (event) => {
-      console.log(event.target);
-      const found = items.find((item) => {
-        return item.name === event.target.innerText;
-      });
-      setCurrentItem(found);
-    };
+      const selectItem = (event) => {
+        console.log(event.target);
+        const found = items.find((item) => {
+          return item.name === event.target.innerText;
+        });
+        setCurrentItem(found);
+      };
+
+      //save
+      const saveItem = () => {
+        if (!currentItem.name) {
+          return;
+        }
+
+        fetch('/api/fruits', {
+          method:"POST",
+          headers:{ 'Content-Type': 'application/json'},
+          body: JSON.stringify(currentItem)
+        })
+        .then(res=> res.json())
+        .then((data) =>{
+        // if item has no _id, it wasn't previously saved DB
+          if (!currentItem._id) {
+            currentItem._id = data._id;
+            setCurrentItem(currentItem);
+            // update items list
+            let newItems = [...items];
+            newItems.push(currentItem);
+            setItems(newItems);
+          }
+        });
+      }
+
+      
+    //delete
+      const deleteItem =() => {
+        console.log('should delete')
+        let id = currentItem.name;
+        //delete item from DB
+        fetch(`/api/fruits/${id}`, {
+          method: "DELETE"
+        })
+          .then(res => res.json())
+          .then((data) => {
+            // remove item from list
+            const newItems = items.filter((item) => {
+              return item.name !== id;
+            });
+            setItems(newItems);
+            // clear form
+            setCurrentItem({})
+          });
+      }  
 
     // update list state
-    const handleChange = (event) => {
-      console.log(event.target)
-      let newItem = {...currentItem};
-      newItem[event.target.name] = event.target.value;
-      console.log(newItem)
+      const handleChange = (event) => {
+        //console.log(event.target)
+        let newItem = {...currentItem};
+        newItem[event.target.name] = event.target.value;
+        //console.log(newItem)
+        
+        //update currentItem state
+        setCurrentItem(newItem);
+        //update list state
+        const updatedItems = items.map((item) => {
+          if (item._id === newItem.id) {
+            return newItem;
+          }
+          return item;
+        });
+        setItems(items);
+      }
 
-    //update currentItem state
-      setCurrentItem(newItem);
-
-    //update list state
-      items.find((item,index) => {
-        if(item.name == newItem.name) {
-          items[index] = newItem;
-          setItems(items);
-        }
-      })
-    }
-
-    const handleClear = () => {
-      setItems(<%- fruits %>);
-      setCurrentItem({});
-    };
+      const handleClear = () => {
+        setItems(<%- fruits %>);
+        setCurrentItem({});
+      };
 
       
       return (
@@ -83,7 +152,9 @@
           <h1>Fruits</h1>
           <Fruits items={items} onClick={selectItem}/>
           <Detail detail={currentItem} onChange={handleChange}/>
-          <ClearButton onClick={handleClear} />
+          <ClearButton onClick={handleClear}/>
+          <SaveButton onClick={saveItem}/>
+          <DeleteButton onClick={deleteItem}/>
         </div>
       );
     };
